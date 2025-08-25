@@ -36,6 +36,7 @@ pip install .[plotting]
 The [plotting] extra installs optional packages (pyvista, plotly) required for interactive 3D visualization.
 If you only need core computations, you can install without it:
 ```bash
+# Install without plotting
 pip install .
 ```
 Installation will also fetch the dependency
@@ -47,7 +48,7 @@ Installation will also fetch the dependency
 
 ```python
 import numpy as np
-from particle_tomography import particle_tomography
+import particle_tomography
 
 # Example inputs
 images = np.random.rand(41, 64, 64)  # 41 projections of size 64x64

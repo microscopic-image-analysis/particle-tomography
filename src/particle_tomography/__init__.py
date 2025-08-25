@@ -1,3 +1,4 @@
-from .runner import particle_tomography
+# __init__.py
+from .runner import reconstruct
 
-__all__ = ["particle_tomography"]
+__all__ = ["reconstruct"]

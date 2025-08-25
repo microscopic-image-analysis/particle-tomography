@@ -6,7 +6,7 @@ from .model import ParticleTomographyModel
 from .training_plan import build_simple_plan
 
 
-def particle_tomography( # public API TODO: add docstring
+def reconstruct( # public API TODO: add docstring
     images,
     rotations,
     shifts=None,
