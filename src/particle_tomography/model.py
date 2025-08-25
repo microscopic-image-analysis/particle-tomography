@@ -19,7 +19,7 @@ class ParticleTomographyModel(nn.Module):
         self.grid_size_y = images.shape[1]  # H
         self.grid_size_x = images.shape[2]  # W
         self.kernel_size = kernel_size      # kernel size used in convolution
-        print("This is the kernel size:", self.kernel_size)
+        print("Initializing model with kernel size", self.kernel_size)
         self.dtype = torch.float32 # currently only float32 supported
         self.device = device
         self.rasterizer = DifferentiableRasterizer((self.grid_size_y, self.grid_size_x,), self.kernel_size,
