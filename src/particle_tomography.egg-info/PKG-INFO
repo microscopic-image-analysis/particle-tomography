@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: particle-tomography
+Version: 0.1.0
+Summary: A package for 3D tomographic reconstruction using point clouds instead of voxel grids.
+Author: Tobias Pretschold
+Author-email: Tobias Pretschold <tobias.pretschold@uni-jena.de>
+License: MIT
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: torch
+Requires-Dist: plotly
+Requires-Dist: matplotlib
+Requires-Dist: pyvista
+Requires-Dist: differentiable-rasterizer@ git+https://github.com/microscopic-image-analysis/differentiable-rasterizer
+Dynamic: author
+Dynamic: requires-python
+
+test

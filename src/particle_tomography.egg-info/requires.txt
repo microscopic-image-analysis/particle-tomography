@@ -1,0 +1,6 @@
+numpy
+torch
+plotly
+matplotlib
+pyvista
+differentiable-rasterizer@ git+https://github.com/microscopic-image-analysis/differentiable-rasterizer
