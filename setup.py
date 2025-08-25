@@ -17,6 +17,6 @@ setup(
     ],
     extras_require={
         # Optional 3D plotting dependency
-        "plotting": ["pyvista", "pyvista"],
+        "plotting": ["pyvista", "plotly"],
     },
 )
