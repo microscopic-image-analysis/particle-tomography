@@ -1,8 +1,7 @@
 ## Installation
 
 
-This package depends on **PyTorch**, but PyTorch GPU builds are not available on PyPI by default.  
-Please install the version of PyTorch that matches your system and CUDA version **before** installing `particle-tomography`.
+This package depends on **PyTorch**. Please install the version of PyTorch that matches your system and CUDA version **before** installing `particle-tomography`.
 
 Check the [official PyTorch installation instructions](https://pytorch.org/get-started/locally/) for details.
 
@@ -13,7 +12,7 @@ Examples:
 pip install torch --index-url https://download.pytorch.org/whl/cpu
 
 # CUDA 12.8
-pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu128
+pip install torch --index-url https://download.pytorch.org/whl/cu128
 ```
 
 Verify your installation:
@@ -23,18 +22,23 @@ print(torch.__version__)
 print("CUDA available:", torch.cuda.is_available())
 ```
 
----
 
-Then clone this repository and run the installation command:
+Then clone this repository and install:
 
 
 ```bash
-git clone https://github.com/yourusername/particle-tomography.git
+git clone https://github.com/microscopic-image-analysis/particle-tomography
 cd particle-tomography
+
+# Install with optional 3D plotting support
+pip install .[plotting]
+```
+The [plotting] extra installs optional packages (pyvista, plotly) required for interactive 3D visualization.
+If you only need core computations, you can install without it:
+```bash
 pip install .
 ```
-
-This will also fetch the dependency
+Installation will also fetch the dependency
 [differentiable-rasterizer](https://github.com/microscopic-image-analysis/differentiable-rasterizer).
 
 ---
@@ -50,7 +54,7 @@ images = np.random.rand(41, 64, 64)  # 41 projections of size 64x64
 rotations = np.random.rand(41, 3, 3) # random rotation matrices
 
 # Run reconstruction (uses GPU if available, otherwise falls back to CPU)
-reconstructed = particle_tomography(images, rotations, num_points=5000, total_iterations=2000)
+model = particle_tomography(images, rotations, num_points=5000, total_iterations=2000)
 ```
 
 ---

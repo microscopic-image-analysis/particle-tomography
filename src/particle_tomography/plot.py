@@ -1,8 +1,14 @@
 import numpy as np
 import torch
-import plotly.graph_objects as go
 import matplotlib.pyplot as plt
-import pyvista as pv
+try:
+    import pyvista as pv
+except ImportError:
+    pv = None
+try:
+    import plotly.graph_objects as go
+except ImportError:
+    go = None
 
 
 def plot_volume(vol, cmap="viridis"):
@@ -13,6 +19,8 @@ def plot_volume(vol, cmap="viridis"):
         vol (torch.Tensor or np.ndarray): 3D volume data in (Z, Y, X) order.
         cmap (str): Colormap name for visualization.
     """
+    if pv is None:
+        raise RuntimeError("pyvista not installed. Use `pip install particle-tomography[plotting]`")
     # Convert to NumPy array if input is a torch tensor
     if isinstance(vol, torch.Tensor):
         vol = vol.detach().cpu().numpy()
@@ -40,6 +48,8 @@ def plot_points(X, Y=None, side=(1.25, 1.25, 1.25), title=None):
         side (tuple): Half-widths for x, y, z axes.
         title (str, optional): Plot title.
     """
+    if go is None:
+        raise RuntimeError("plotly not installed. Use `pip install particle-tomography[plotting]`")
     fig = go.Figure(data=[
         go.Scatter3d(
             x=X[:, 0], y=X[:, 1], z=X[:, 2],

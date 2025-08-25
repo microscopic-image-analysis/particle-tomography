@@ -12,9 +12,11 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "numpy",
-        "plotly",
         "matplotlib",
-        "pyvista",
         "differentiable-rasterizer @ git+https://github.com/microscopic-image-analysis/differentiable-rasterizer",
     ],
+    extras_require={
+        # Optional 3D plotting dependency
+        "plotting": ["pyvista", "pyvista"],
+    },
 )
