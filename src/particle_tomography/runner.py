@@ -20,7 +20,7 @@ def particle_tomography( # public API TODO: add docstring
     batch_size=None,
     lr=2.5e-3,
     num_rejuvenates=1,
-    rejuv_in_box=True,
+    rejuv_in_box=False,
     geom_start_fraction=1.0,
     device='cpu',
 ):

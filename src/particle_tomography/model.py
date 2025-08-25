@@ -124,10 +124,12 @@ class ParticleTomographyModel(nn.Module):
         _, weights, _ =self.get_volume_sparse()
         plot_weights(weights)
 
-    def plot_fsc(self, true_vol):
+    def plot_fsc(self, true_vol, show_plot=True):
         freqs, fsc_values = self.get_fsc(true_vol)
-        plot_fsc(freqs, fsc_values)
-
+        fig = plot_fsc(freqs, fsc_values)
+        if show_plot:
+            fig.show()
+        return fig
 
     def forward(self, indices):
         """
