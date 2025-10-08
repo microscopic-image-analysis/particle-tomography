@@ -6,7 +6,7 @@ import numpy as np
 import sys
 import pathlib
 
-from particle_tomography.runner import reconstruct
+from particle_tomography import reconstruct
 from particle_tomography.training_plan import build_plan_from_config
 from particle_tomography.config import TrainingStep, GMMRejuvenateStep, SaveImagesStep, \
     ParticleTomographyConfig, InputDataConfig, ModelConfig, TrainingConfig
@@ -66,11 +66,11 @@ def main():
                         training_plan=training_plan,
                         device=config.model.device,
                         )
-    # true_volume = load_vesicle_ground_truth(TRUE_VOL_PATH)
+
     # model.plot_volume()
     # model.plot_points()
     # model.plot_weights()
-    # plot_volume(true_volume)
+    # true_volume = load_vesicle_ground_truth(TRUE_VOL_PATH)
     # model.plot_fsc(true_volume)
 
 
