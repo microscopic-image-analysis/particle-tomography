@@ -123,14 +123,15 @@ class ParticleTomographyTrainer:
                 self.model.rejuvenate_GMM(step.rejuv_in_box)
 
             elif isinstance(step, SaveImagesStep):
+                # save model
+                self.model.save_model(path=step.out_dir)
+
                 # Get current reconstruction
-                points, weights, bandwidth = self.model.get_volume_sparse()
                 volume = self.model.get_volume()
                 true_volume = step.load_true_volume()
 
-                # Save output
+                # Save volume and images
                 save_output(
-                    points, weights, bandwidth,
                     reconstruction=volume,
                     true_volume=true_volume,
                     logging_prefix=step.logging_prefix,

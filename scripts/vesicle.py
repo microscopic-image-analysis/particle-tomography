@@ -3,11 +3,14 @@ import mrcfile
 import time
 import torch
 import numpy as np
+import sys
+import pathlib
 
 from particle_tomography.runner import reconstruct
 from particle_tomography.training_plan import build_plan_from_config
 from particle_tomography.config import TrainingStep, GMMRejuvenateStep, SaveImagesStep, \
     ParticleTomographyConfig, InputDataConfig, ModelConfig, TrainingConfig
+sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent))
 from data.loader import load_vesicle_data
 from particle_tomography.plot import show_images, plot_volume
 
@@ -77,4 +80,4 @@ if __name__ == "__main__":
     t1 = time.time()
     main()
     t2 = time.time()
-    print(t2 - t1)
+    print("runtime:",t2 - t1)
