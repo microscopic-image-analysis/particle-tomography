@@ -1,6 +1,8 @@
 numpy
-torch
-plotly
+scipy
 matplotlib
-pyvista
 differentiable-rasterizer@ git+https://github.com/microscopic-image-analysis/differentiable-rasterizer
+
+[plotting]
+pyvista
+plotly

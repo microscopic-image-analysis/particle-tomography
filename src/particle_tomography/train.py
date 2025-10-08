@@ -22,7 +22,6 @@ class ParticleTomographyTrainer:
             self.model.log_noise_std,
             self.model.log_bandwidth
         ]
-
         geometry_params = [
             self.model.rotation_quats,
             self.model.shifts
@@ -107,7 +106,7 @@ class ParticleTomographyTrainer:
                 print(f"Epoch {epoch + 1}/{num_epochs}, Loss per image: {avg_loss:.4f}")
                 print(f"  Noise Std: {self.model.noise_std.item():.4f}")
                 print(f"  R-factor: {r_factor:.4f}")
-                print(self.model.bandwidth)
+                print(f"  Current bandwidth: {self.model.bandwidth.item()}")
 
 
     def fit(self):

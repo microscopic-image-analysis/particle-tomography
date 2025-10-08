@@ -17,11 +17,9 @@ dependencies = [
   "numpy",
   "scipy",
   "matplotlib",
-  "differentiable-rasterizer @ git+https://github.com/microscopic-image-analysis/differentiable-rasterizer",
+  "pyvista",
+  "plotly",
 ]
-
-[project.optional-dependencies]
-plotting = ["pyvista", "plotly"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

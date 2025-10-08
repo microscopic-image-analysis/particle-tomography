@@ -1,17 +1,20 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .utils import rasterize_and_smooth_3d, fsc
+from numpy.ma.core import indices
+
+from .utils import fsc
 
 from rasterizer import DifferentiableRasterizer
 from .utils import quat_to_matrix, matrix_to_quat
 from .plot import plot_volume, plot_points, plot_weights, plot_fsc
+from .raster3d import rasterize_and_smooth_3d_blocked
 
 class ParticleTomographyModel(nn.Module):
     def __init__(
             self, images, rotations, shifts=None, num_points=3000,
             initial_points=None, initial_weights=None, particle_init_mode="isonormal",
-            kernel_size=3, dtype=torch.float32, device='cpu',
+            kernel_size=3, start_bandwidth=1.0, dtype=torch.float32, device='cpu',
     ):
         super().__init__()
         self.num_points = num_points
@@ -62,9 +65,10 @@ class ParticleTomographyModel(nn.Module):
         )
 
         # Radius of particles (global)
-        self.log_bandwidth = nn.Parameter(
-            torch.tensor(0.0, dtype=dtype, device=device) # in units of pixel size
+        log_start_bandwidth = torch.log(
+            torch.tensor(start_bandwidth, dtype=dtype, device=device)
         )
+        self.log_bandwidth = nn.Parameter(log_start_bandwidth)
 
 
     @property
@@ -93,14 +97,19 @@ class ParticleTomographyModel(nn.Module):
         return (self.points.detach().cpu(), self.point_weights.detach().cpu(), self.bandwidth.detach().cpu(),
                 self.noise_std.detach().cpu(), self.scale.detach().cpu())
 
+    def get_shifts(self):
+        return self.shifts.detach().cpu()
+
+
     def get_volume(self):
         """Convert internal volume representation (GMM) to voxel representation."""
         x = self.grid_size_x
         y = self.grid_size_y
         z = max (self.grid_size_x, self.grid_size_y)
         gridsize = (z, y, x)
-        vol = rasterize_and_smooth_3d(self.points.detach(), self.point_weights.detach(), gridsize, sigma=self.bandwidth,
+        vol = rasterize_and_smooth_3d_blocked(self.points.detach(), self.point_weights.detach(), gridsize, sigma=self.bandwidth,
                                    kernel_size=self.kernel_size, device=self.device)
+        vol = vol * self.scale.mean().detach().cpu().numpy() # rescale
         return vol
 
     def get_volume_sparse(self):
@@ -110,6 +119,14 @@ class ParticleTomographyModel(nn.Module):
         vol =  self.get_volume()
         freqs, fsc_values = fsc(vol, true_vol)
         return freqs, fsc_values
+
+    def get_r_factor(self):
+        indices = range(self.num_images)
+        projected, target = self.forward(indices)
+        abs_diff = torch.abs(projected - target).sum().item()
+        abs_obs = torch.abs(target).sum().item()
+        r_factor = abs_diff / abs_obs if abs_obs > 0 else float('inf')
+        return r_factor
 
     # wrappers for visualization
     def plot_volume(self):
@@ -143,7 +160,6 @@ class ParticleTomographyModel(nn.Module):
                                       translations=shifts, bandwidth=self.bandwidth)
         scale = self.scale[indices].unsqueeze(-1).unsqueeze(-1)
         scaled_projection_imgs = scale * projections
-
         return scaled_projection_imgs, imgs
 
 

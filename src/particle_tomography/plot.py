@@ -27,7 +27,8 @@ def plot_volume(vol, cmap="viridis"):
 
 
     # Create a PyVista uniform grid with voxel dimensions
-    grid = pv.ImageData(dimensions=vol.shape)
+    nz, ny, nx = vol.shape
+    grid = pv.ImageData(dimensions=(nx+1, ny+1, nz+1))
     grid["values"] = vol.flatten(order="C")
 
     # Plot the volume

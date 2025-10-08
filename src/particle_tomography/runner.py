@@ -15,6 +15,7 @@ def reconstruct( # public API TODO: add docstring
     initial_points=None,
     initial_weights=None,
     kernel_size=3,
+    start_bandwidth=1.0,
     training_plan=None,
     total_iterations=2000,
     batch_size=None,
@@ -65,6 +66,7 @@ def reconstruct( # public API TODO: add docstring
         initial_points=initial_points,
         initial_weights=initial_weights,
         kernel_size=kernel_size,
+        start_bandwidth=start_bandwidth,
         dtype=torch.float32,
         device=device
     )
