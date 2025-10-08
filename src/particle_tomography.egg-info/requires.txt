@@ -1,8 +1,0 @@
-numpy
-scipy
-matplotlib
-differentiable-rasterizer@ git+https://github.com/microscopic-image-analysis/differentiable-rasterizer
-
-[plotting]
-pyvista
-plotly
