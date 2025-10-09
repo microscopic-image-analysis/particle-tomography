@@ -19,6 +19,7 @@ dependencies = [
   "matplotlib",
   "pyvista",
   "plotly",
+  "mrcfile"
 ]
 
 [tool.setuptools]
