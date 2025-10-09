@@ -24,8 +24,8 @@ class ParticleTomographyModel(nn.Module):
         print("Initializing model with kernel size", self.kernel_size)
         self.dtype = torch.float32 # currently only float32 supported
         self.device = device
-        self.rasterizer = DifferentiableRasterizer((self.grid_size_y, self.grid_size_x,), self.kernel_size,
-                                                   self.device)
+        self.rasterizer = DifferentiableRasterizer((self.grid_size_y, self.grid_size_x,), kernel_size=self.kernel_size,
+                                                   device=self.device)
 
         # Initialize 3D points (Gaussian centers)
         if initial_points is None:
@@ -155,13 +155,14 @@ class ParticleTomographyModel(nn.Module):
             "bandwidth": self.bandwidth.detach().cpu(),
             "noise_std": self.noise_std.detach().cpu(),
             "scale": self.scale.detach().cpu(),
+            "kernel_size": self.kernel_size,
         }
         torch.save(state, path)
         print(f"[ParticleTomographyModel] Saved model state to {path}")
 
     @classmethod
     def from_saved_state(cls, path: str, images, rotations, shifts=None,
-                         kernel_size=3, dtype=torch.float32, device='cpu',
+                         dtype=torch.float32, device='cpu',
                          **kwargs):
         """Initialize model from a saved state file."""
         state = torch.load(path, map_location=device)
@@ -171,7 +172,7 @@ class ParticleTomographyModel(nn.Module):
             images=images,
             rotations=rotations,
             shifts=shifts,
-            kernel_size=kernel_size,
+            kernel_size=state["kernel_size"],
             dtype=dtype,
             device=device,
             **kwargs

@@ -1,3 +1,5 @@
+import os.path
+
 import torch
 from torch.utils.data import DataLoader
 
@@ -124,7 +126,7 @@ class ParticleTomographyTrainer:
 
             elif isinstance(step, SaveImagesStep):
                 # save model
-                self.model.save_model(path=step.out_dir)
+                self.model.save_model(path=os.path.join(step.out_dir, "model.pt") )
 
                 # Get current reconstruction
                 volume = self.model.get_volume()
@@ -132,6 +134,9 @@ class ParticleTomographyTrainer:
 
                 # Save volume and images
                 save_output(
+                    points=None,
+                    weights=None,
+                    bandwidth=None,
                     reconstruction=volume,
                     true_volume=true_volume,
                     logging_prefix=step.logging_prefix,

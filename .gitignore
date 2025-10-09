@@ -1,6 +1,7 @@
 build/
 data/protein
 data/thinfilm
+data/loader.py
 out/
 scripts/*
 !scripts/vesicle.py

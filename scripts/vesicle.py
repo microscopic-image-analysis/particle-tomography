@@ -1,8 +1,6 @@
 from pathlib import Path
-import mrcfile
 import time
 import torch
-import numpy as np
 import sys
 import pathlib
 
@@ -11,7 +9,7 @@ from particle_tomography.training_plan import build_plan_from_config
 from particle_tomography.config import TrainingStep, GMMRejuvenateStep, SaveImagesStep, \
     ParticleTomographyConfig, InputDataConfig, ModelConfig, TrainingConfig
 sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent))
-from data.loader import load_vesicle_data
+from data.vesicle_loader import load_vesicle_data, load_vesicle_ground_truth
 from particle_tomography.plot import show_images, plot_volume
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]  # two levels up from scripts/
@@ -19,10 +17,6 @@ DATA_DIR = PROJECT_ROOT / "data" / "vesicle"
 OUT_DIR = PROJECT_ROOT / "out" / "vesicle"
 TRUE_VOL_PATH = DATA_DIR / "vesicle.mrc"
 
-def load_vesicle_ground_truth(path):
-    with mrcfile.open(path, permissive=True) as mrc:
-        true_vol = mrc.data.astype(np.float32).transpose(2, 1, 0)  # (Z, Y, X)
-    return true_vol
 
 def build_vesicle_config():
     return ParticleTomographyConfig(

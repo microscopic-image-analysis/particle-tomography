@@ -59,7 +59,7 @@ runtime: 4.665709018707275
 
 The script will reconstruct a biological vesicle from 41 projection images. When run successfully, a folder out with projection and slice images of the ground truth volume and the reconstruction is created. It also creates a plot of the FSC correlation curve as a function of frequency. The reconstructed volume (dense voxel representation of the volume) and the model state (sparse representation of the volume) are also saved.
 
-Internally -- after building an optional config structure for the vesicle dataset -- the script executes:
+Internally (after building an optional config structure for the vesicle dataset), the script executes:
 ```python
 from particle_tomography import reconstruct
     
