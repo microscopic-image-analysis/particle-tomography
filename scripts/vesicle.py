@@ -10,12 +10,12 @@ from particle_tomography.config import TrainingStep, GMMRejuvenateStep, SaveImag
     ParticleTomographyConfig, InputDataConfig, ModelConfig, TrainingConfig
 sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent))
 from data.vesicle_loader import load_vesicle_data, load_vesicle_ground_truth
-from particle_tomography.plot import show_images, plot_volume
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]  # two levels up from scripts/
 DATA_DIR = PROJECT_ROOT / "data" / "vesicle"
 OUT_DIR = PROJECT_ROOT / "out" / "vesicle"
 TRUE_VOL_PATH = DATA_DIR / "vesicle.mrc"
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def build_vesicle_config():
@@ -64,8 +64,8 @@ def main():
     # model.plot_volume()
     # model.plot_points()
     # model.plot_weights()
-    # true_volume = load_vesicle_ground_truth(TRUE_VOL_PATH)
-    # model.plot_fsc(true_volume)
+    true_volume = load_vesicle_ground_truth(TRUE_VOL_PATH)
+    model.plot_fsc(true_volume)
 
 
 if __name__ == "__main__":

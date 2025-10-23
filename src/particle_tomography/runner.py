@@ -1,9 +1,9 @@
 import torch
 import numpy as np
 
-from .train import ParticleTomographyTrainer
-from .model import ParticleTomographyModel
-from .training_plan import build_simple_plan
+from particle_tomography.train import ParticleTomographyTrainer
+from particle_tomography.model import ParticleTomographyModel
+from particle_tomography.training_plan import build_simple_plan
 
 
 def reconstruct( # public API TODO: add docstring

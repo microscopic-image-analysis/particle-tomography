@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
 from rasterizer import DifferentiableRasterizer
 
@@ -75,6 +76,10 @@ class ParticleTomographyModel(nn.Module):
         return quat_to_matrix(self.rotation_quats)[:, :2, :].contiguous()
 
     @property
+    def rotations(self):
+        return quat_to_matrix(self.rotation_quats)
+
+    @property
     def point_weights(self):
         """Get weights from log_weights using softmax"""
         return torch.softmax(self.log_point_weights, dim=0)
@@ -115,7 +120,11 @@ class ParticleTomographyModel(nn.Module):
         return self.points.detach().cpu(), self.point_weights.detach().cpu(), self.bandwidth.detach().cpu()
 
     def get_fsc(self, true_vol):
-        vol =  self.get_volume()
+        """
+        Compute the Fourier Shell Correlation (FSC) between the reconstructed
+        volume from this object and a provided ground-truth volume.
+        """
+        vol = self.get_volume()
         freqs, fsc_values = fsc(vol, true_vol)
         return freqs, fsc_values
 
@@ -161,11 +170,15 @@ class ParticleTomographyModel(nn.Module):
         print(f"[ParticleTomographyModel] Saved model state to {path}")
 
     @classmethod
-    def from_saved_state(cls, path: str, images, rotations, shifts=None,
+    def from_saved_state(cls, path: str, images=None, rotations=None, shifts=None,
                          dtype=torch.float32, device='cpu',
                          **kwargs):
         """Initialize model from a saved state file."""
         state = torch.load(path, map_location=device)
+        if images is None:
+            images = torch.zeros((1,20,20), dtype=dtype, device=device) # 1 dummy image
+        if rotations is None:
+            rotations = torch.eye(3, dtype=dtype, device=device).unsqueeze(0) # 1 dummy rotation
 
         # Create a new model instance
         model = cls(
@@ -179,11 +192,18 @@ class ParticleTomographyModel(nn.Module):
         )
 
         # Load saved parameters into model
-        model.points.data = state["points"].to(device=device, dtype=dtype)
-        model.log_point_weights.data = torch.log(state["point_weights"].to(device=device, dtype=dtype))
-        model.log_bandwidth.data = torch.log(state["bandwidth"].to(device=device, dtype=dtype))
-        model.log_noise_std.data = torch.log(state["noise_std"].to(device=device, dtype=dtype))
-        model.log_scale.data = torch.log(state["scale"].to(device=device, dtype=dtype))
+        points = state["points"].to(device=device, dtype=dtype)  # shape (N, 3)
+        point_weights = state["point_weights"].to(device=device, dtype=dtype)  # shape (N,)
+        bandwidth = state["bandwidth"].to(device=device, dtype=dtype)
+        noise_std = state["noise_std"].to(device=device, dtype=dtype)
+        scale = state["scale"].to(device=device, dtype=dtype)
+
+        # set parameters
+        model.points.data = points
+        model.log_point_weights.data = torch.log(point_weights)
+        model.log_bandwidth.data = torch.log(bandwidth)
+        model.log_noise_std.data = torch.log(noise_std)
+        model.log_scale.data = torch.log(scale)
 
         print(f"[ParticleTomographyModel] Loaded model state from {path}")
         return model
