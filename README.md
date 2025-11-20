@@ -1,9 +1,7 @@
 ## Installation
 
 
-This package depends on **PyTorch**. Please install the version of PyTorch that matches your system and CUDA version **before** installing `particle-tomography`.
-
-Check the [official PyTorch installation instructions](https://pytorch.org/get-started/locally/) for details.
+This package depends on **PyTorch**. Please install the version of PyTorch that matches your system and CUDA version **before** installing `particle-tomography`. Check the [official PyTorch installation instructions](https://pytorch.org/get-started/locally/) for details.
 
 This package also depends on **differentiable-rasterizer**. Please install it first and follow the instructions [here](https://github.com/microscopic-image-analysis/differentiable-rasterizer).
 

@@ -1,10 +1,10 @@
 build/
-data/protein
+data/vesicle
 data/thinfilm
 data/loader.py
 out/
 scripts/*
-!scripts/vesicle.py
+!scripts/protein.py
 
 *.so
 *.pyd

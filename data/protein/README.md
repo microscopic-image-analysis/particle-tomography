@@ -1,0 +1,1 @@
+Data is based on Protein Database entry [6B3R](https://www.rcsb.org/structure/6B3R)
