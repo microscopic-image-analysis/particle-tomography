@@ -7,7 +7,7 @@ from rasterizer import DifferentiableRasterizer
 
 from particle_tomography.utils import fsc
 from particle_tomography.utils import quat_to_matrix, matrix_to_quat
-from particle_tomography.plot import plot_volume, plot_points, plot_weights, plot_fsc
+from particle_tomography.plot import plot_volume, plot_weights, plot_fsc, plot_points
 from particle_tomography.raster3d import rasterize_and_smooth_3d_blocked
 
 class ParticleTomographyModel(nn.Module):
@@ -137,13 +137,13 @@ class ParticleTomographyModel(nn.Module):
         return r_factor
 
     # wrappers for visualization
-    def plot_volume(self):
+    def plot_volume(self, camera=None, path=None):
         vol = self.get_volume()
-        plot_volume(vol)
+        plot_volume(vol, camera=camera, path=path)
 
-    def plot_points(self):
+    def plot_points(self, bounding_box=(1.25, 1.25, 1.25)):
         points, _, _ = self.get_volume_sparse()
-        plot_points(points)
+        plot_points(points, side=bounding_box)
 
     def plot_weights(self):
         _, weights, _ =self.get_volume_sparse()
@@ -165,6 +165,8 @@ class ParticleTomographyModel(nn.Module):
             "noise_std": self.noise_std.detach().cpu(),
             "scale": self.scale.detach().cpu(),
             "kernel_size": self.kernel_size,
+            "grid_size_x": self.grid_size_x,
+            "grid_size_y": self.grid_size_y
         }
         torch.save(state, path)
         print(f"[ParticleTomographyModel] Saved model state to {path}")
@@ -176,7 +178,7 @@ class ParticleTomographyModel(nn.Module):
         """Initialize model from a saved state file."""
         state = torch.load(path, map_location=device)
         if images is None:
-            images = torch.zeros((1,20,20), dtype=dtype, device=device) # 1 dummy image
+            images = torch.zeros((1, state["grid_size_x"], state["grid_size_y"] ), dtype=dtype, device=device) # 1 dummy image
         if rotations is None:
             rotations = torch.eye(3, dtype=dtype, device=device).unsqueeze(0) # 1 dummy rotation
 
@@ -226,32 +228,16 @@ class ParticleTomographyModel(nn.Module):
     def loss(self, projected_images, target_images):
         """
         Compute L1 loss.
-
-        Args:
-            projected_images (Tensor): Model predictions of shape (N, H, W)
-            target_images (Tensor): Ground truth images of the same shape
-
-        Returns:
-            Tensor: Scalar loss (negative log-likelihood up to constant)
         """
         residuals = projected_images - target_images
         abs_residuals = torch.sum(torch.abs(residuals))  # sum over all pixels and images
-        loss = abs_residuals * torch.exp(-self.log_noise_std) + residuals.numel() * self.log_noise_std
+        loss = abs_residuals * torch.exp(-self.log_noise_std) + residuals.numel() * 2 * self.log_noise_std
         return loss
 
 
     def init_particles(self, n_particles, mode, dtype=torch.float32, device='cpu'):
         """
         Initialize particles based on the specified mode.
-
-        Args:
-            n_particles: Number of particles to initialize
-            mode: Initialization mode ('isonormal' or 'thinfilm')
-            dtype: torch data type (default: torch.float32)
-            device: torch device (default: 'cpu')
-
-        Returns:
-            torch.Tensor: Shape (n_particles, 3) containing initialized particle positions
         """
         torch.manual_seed(0)
         if mode == 'isonormal':

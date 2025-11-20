@@ -11,35 +11,59 @@ except ImportError:
     go = None
 
 
-def plot_volume(vol, cmap="viridis"):
+def plot_volume(vol, cmap="viridis", camera=None, path=None, side=(1, 1, 1)):
     """
-    Visualize a 3D volume (Z, Y, X) using PyVista.
-
-    Parameters:
-        vol (torch.Tensor or np.ndarray): 3D volume data in (Z, Y, X) order.
-        cmap (str): Colormap name for visualization.
+    Visualize a 3D volume (Z, Y, X) using PyVista with optional camera control,
+    normalizing the axes to [-side_i, side_i] instead of voxel indices.
     """
     if pv is None:
-        raise RuntimeError("pyvista not installed. Use `pip install particle-tomography[plotting]`")
-    # Convert to NumPy array if input is a torch tensor
+        raise RuntimeError("pyvista not installed. Use `pip install pyvista`")
+
     if isinstance(vol, torch.Tensor):
         vol = vol.detach().cpu().numpy()
 
-
-    # Create a PyVista uniform grid with voxel dimensions
     nz, ny, nx = vol.shape
-    grid = pv.ImageData(dimensions=(nx+1, ny+1, nz+1))
+
+    # --- Create a uniform grid centered at 0 with dimensions normalized ---
+    grid = pv.ImageData(dimensions=(nx + 1, ny + 1, nz + 1))
+
+    # Compute spacing so the axes run from -side_i to +side_i
+    grid.spacing = (
+        (2*side[0]) / nx,
+        (2*side[1]) / ny,
+        (2*side[2]) / nz
+    )
+
+    # Translate grid so center is at 0
+    grid.origin = (-side[0], -side[1], -side[2])
+
+    # Add volume data
     grid["values"] = vol.flatten(order="C")
 
-    # Plot the volume
-    plotter = pv.Plotter()
-    plotter.add_volume(grid, scalars="values", cmap=cmap, opacity="linear")
+    # create plotter
+    if path is not None:
+        plotter = pv.Plotter(off_screen=True, window_size=[2000, 2000])
+    else:
+        plotter = pv.Plotter()
     plotter.show_axes()
     plotter.show_grid()
-    plotter.show()
 
+    plotter.add_volume(grid, cmap=cmap, scalars="values", show_scalar_bar=False)
 
-def plot_points(X, Y=None, side=(1.25, 1.25, 1.25), title=None):
+    # --- Camera control ---
+    if camera is not None:
+        plotter.camera_position = camera
+    else:
+        plotter.view_isometric()
+
+    # --- Show or save ---
+    if path is not None:
+        plotter.show(screenshot=path)
+        print(f"Saved volume image to {path}")
+    else:
+        plotter.show()
+
+def plot_points(X, side=(1.25, 1.25, 1.25), title=None):
     """
     Plot a 3D point cloud with optional ground truth and title.
 
@@ -59,14 +83,6 @@ def plot_points(X, Y=None, side=(1.25, 1.25, 1.25), title=None):
         )
     ])
 
-    if Y is not None:
-        fig.add_trace(
-            go.Scatter3d(
-                x=Y[:, 0], y=Y[:, 1], z=Y[:, 2],
-                name="GT", mode='markers',
-                marker=dict(size=3, line=dict(width=1, color='Black'))
-            )
-        )
 
     # Calculate aspect ratios proportional to the side dimensions
     max_side = max(side)
