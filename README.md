@@ -5,21 +5,6 @@ This package depends on **PyTorch**. Please install the version of PyTorch that 
 
 Check the [official PyTorch installation instructions](https://pytorch.org/get-started/locally/) for details.
 
-Examples:
-
-```bash
-# CPU-only
-pip install torch --index-url https://download.pytorch.org/whl/cpu
-
-# CUDA 12.8
-pip install torch --index-url https://download.pytorch.org/whl/cu128
-```
-
-Verify your installation:
-```bash
-python -c "import torch; print('PyTorch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available())"
-```
-
 This package also depends on **differentiable-rasterizer**. Please install it first and follow the instructions [here](https://github.com/microscopic-image-analysis/differentiable-rasterizer).
 
 Then clone this repository and install:
