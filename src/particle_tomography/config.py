@@ -20,7 +20,8 @@ class ModelConfig:
     particle_init_mode: str = "isonormal"           # Particle initialization mode (e.g., "isonormal", "thinfilm")
     kernel_size: int = 3                            # kernel_size used in convolution. Has to be odd.
     dtype: torch.dtype = torch.float32              # PyTorch dtype to use. Currently only float32 supported
-    device: str = "cpu"                             # Device to use ("cpu" or "cuda")
+    device: str = "cpu"                             # Device to use ("cpu", "cuda", or "auto")
+    random_seed: Optional[int] = None                # Optional local seed for model initialization
 
 
 # ========== Training Step Configs ==========

@@ -1,24 +1,49 @@
 ## Installation
 
+`particle-tomography` requires PyTorch and `differentiable-rasterizer`. The default rasterizer install uses a PyTorch implementation, so users do not need the CUDA Toolkit just to run the package.
 
-This package depends on **PyTorch**. Please install the version of PyTorch that matches your system and CUDA version **before** installing `particle-tomography`. Check the [official PyTorch installation instructions](https://pytorch.org/get-started/locally/) for details.
+For GPU systems, install the PyTorch build that matches your CUDA setup before installing this package. See the [official PyTorch installation instructions](https://pytorch.org/get-started/locally/) for the correct command for your platform.
 
-This package also depends on **differentiable-rasterizer**. Please install it first and follow the instructions [here](https://github.com/microscopic-image-analysis/differentiable-rasterizer).
-
-Then clone this repository and install:
+Install `differentiable-rasterizer` first, then clone and install this repository:
 
 ```bash
+git clone https://github.com/microscopic-image-analysis/differentiable-rasterizer
+cd differentiable-rasterizer
+pip install -e .
+
+cd ..
 git clone https://github.com/microscopic-image-analysis/particle-tomography
 cd particle-tomography
+pip install -e .
+```
+
+To use the optional custom CUDA rasterizer backend, build it from the local `differentiable-rasterizer` clone before installing or running `particle-tomography`:
+
+```bash
+cd differentiable-rasterizer
+python build_cuda.py
+cd ../particle-tomography
 pip install -e .
 ```
 
 ---
 
 ## Quick Start
-After installation, you can verify that the package and the differentiable rasterizer are working correctly by running the protein.py script:
+After installation, you can verify that the package and the differentiable rasterizer are working correctly by running the protein example from the repository root:
 ```bash
 python scripts/protein.py
+```
+
+The module form is equivalent:
+
+```bash
+python -m scripts.protein
+```
+
+By default, the example uses `--device auto`, which selects CUDA when available and otherwise uses CPU. It does not open interactive plots unless requested:
+
+```bash
+python scripts/protein.py --plot
 ```
 The expected out is similar to:
 ```bash
@@ -37,7 +62,7 @@ FSC at Nyquist: 0.853
 Execution time: 9.75 seconds
 ```
 
-The script will reconstruct a simulated protein from projection images. When run successfully, a folder out with projection and slice images of the ground truth volume and the reconstruction is created. It also creates a plot of the FSC correlation curve as a function of frequency. The reconstructed volume (dense voxel representation of the volume) and the model state (sparse representation of the volume) are also saved.
+The script reconstructs a simulated protein from projection images, saves the sparse model state as `model_protein.pt`, and prints the FSC at Nyquist. Use `--plot` to open interactive point-cloud, volume, and FSC plots after reconstruction.
 
 Internally (after building an optional config structure for the protein dataset), the script executes:
 ```python
@@ -67,5 +92,16 @@ true_volume = load_protein_ground_truth(TRUE_VOL_PATH)
 model.plot_fsc(true_volume)
 ```
 
+---
 
+## Tests
+
+A small CPU-only smoke test suite checks the bundled protein loader, model initialization, a tiny reconstruction, save/load, FSC, R-factor, and operation without CUDA. Install the test extra and run:
+
+```bash
+pip install -e .[test]
+pytest
+```
+
+These tests are intended as a quick functionality check, not as a full reproduction of the paper experiments.
 

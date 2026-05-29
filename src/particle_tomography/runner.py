@@ -6,7 +6,13 @@ from particle_tomography.model import ParticleTomographyModel
 from particle_tomography.training_plan import build_simple_plan
 
 
-def reconstruct( # public API TODO: add docstring
+def _resolve_device(device):
+    if device == "auto":
+        return "cuda" if torch.cuda.is_available() else "cpu"
+    return str(device)
+
+
+def reconstruct(
     images,
     rotations,
     shifts=None,
@@ -24,8 +30,31 @@ def reconstruct( # public API TODO: add docstring
     rejuv_in_box=False,
     geom_start_fraction=1.0,
     device='cpu',
+    random_seed=None,
 ):
+    """Reconstruct a 3D volume from projection images using a particle model.
+
+    Parameters
+    ----------
+    images : np.ndarray or torch.Tensor
+        Projection images with shape ``(N, H, W)``.
+    rotations : np.ndarray or torch.Tensor
+        Rotation matrices with shape ``(N, 3, 3)``.
+    shifts : np.ndarray or torch.Tensor, optional
+        Image shifts with shape ``(N, 2)``. If omitted, zero shifts are used.
+    device : str
+        ``"cpu"``, ``"cuda"``, or ``"auto"``. ``"auto"`` uses CUDA when available.
+    random_seed : int, optional
+        Seed for model-internal random initialization and rejuvenation. The global
+        PyTorch random state is not modified.
+
+    Returns
+    -------
+    ParticleTomographyModel
+        The trained reconstruction model.
+    """
     dtype = torch.float32 # Currently only float32 supported
+    device = _resolve_device(device)
 
     # Convert everything to torch tensors and check shapes
     if isinstance(images, np.ndarray):
@@ -68,7 +97,8 @@ def reconstruct( # public API TODO: add docstring
         kernel_size=kernel_size,
         start_bandwidth=start_bandwidth,
         dtype=torch.float32,
-        device=device
+        device=device,
+        random_seed=random_seed,
     )
 
     # build training plan if not provided
